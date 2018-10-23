@@ -1,5 +1,14 @@
-float Kp = 1.2;
-float Kd = 0.8;
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define ADDR 0x3C
+
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
+
+
+float Kp = 1.0;
+float Kd = 0.5;
 int Sp = 0;
 int lastError = 0;
 
@@ -10,7 +19,7 @@ int PV;
 
 #define enA 3
 #define in1 5
-#define in2 7 
+#define in2 7
 #define enB 13
 #define in3 9
 #define in4 11
@@ -45,10 +54,13 @@ int mid[8];
 String val;
 
 void jalankenMotor();
+void tulisOLED(String buffer);
 
 void setup() {
 
-
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.clearDisplay();
+  display.display();
   pinMode(s1, INPUT);
   pinMode(s2, INPUT);
   pinMode(s3, INPUT);
@@ -57,13 +69,16 @@ void setup() {
   pinMode(s6, INPUT);
   pinMode(s7, INPUT);
   pinMode(s8, INPUT);
-  pinMode(PUSH1,INPUT_PULLUP);
+  pinMode(PUSH1, INPUT_PULLUP);
   //pinMode(s9,INPUT);
   // pinMode(s10,INPUT);
   Serial.begin(9600);
 
-  while(digitalRead(PUSH1)!=1);
-  digitalWrite();
+
+  // display a line of text
+  tulisOLED("Press The Button");
+  while (digitalRead(PUSH1) == 1);
+  tulisOLED("Callibrating..");
 
 
   do
@@ -177,7 +192,7 @@ void setup() {
   }
   while (lp2 <= 30);
 
-
+  tulisOLED("Callibration Done");
 }
 
 void loop() {
@@ -210,6 +225,7 @@ void loop() {
       val += String(sen[i]);
     }
   }
+  tulisOLED(val);
   //  Serial.println(val);
 
   //===================================================================
@@ -347,5 +363,19 @@ void jalankenMotor() {
   digitalWrite(in3, LOW);
   digitalWrite(in4, HIGH);
 
+
+}
+
+void tulisOLED(String buffer) {
+
+  display.clearDisplay();
+  display.display();
+
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(20, 10);
+
+  display.print(buffer);
+  display.display();
 
 }
